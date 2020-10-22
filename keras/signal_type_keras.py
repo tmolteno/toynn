@@ -22,10 +22,9 @@ if __name__=="__main__":
 
     np.random.seed(101)
 
-
     data, labels, t = gen_dataset(N, SIGNAL_LENGTH, NUM_TYPES)
 
-    plot_data(data, labels, t, NUM_TYPES)
+    #plot_data(data, labels, t, NUM_TYPES)
 
     test_data = np.array(data[0:TEST_N])
     test_labels = np.array(labels[0:TEST_N])
@@ -48,6 +47,8 @@ if __name__=="__main__":
 
     loss, test_accuracy = model.evaluate(test_data, test_labels)
 
-
-    print(model.predict(test_data[0:2]))
-    print(test_labels[0:2])
+    ## Now show a few predictions, and their known true values.
+    print("\n\nExample Performance")
+    np.set_printoptions(precision=3, suppress=True)
+    for i in range(5):
+        print("    Truth: {},  Prediction: {}".format(test_labels[i], model.predict(test_data[i:i+1])[0]))
