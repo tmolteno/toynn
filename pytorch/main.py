@@ -10,39 +10,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-def gen_data(t, label, omega, phase, offset, noise_amplitude):
-    '''
-        Generate some training data
-    '''
-    noise = np.random.normal(offset, noise_amplitude, len(t))
-
-    if label == 0:
-        dat = noise + np.sin(omega*t + phase)
-    if label == 1:
-        dat = noise + signal.square(omega*t + phase)
-    if label == 2:
-        dat = noise + signal.sawtooth(omega*t + phase)
-    return dat
-
-
-def gen_dataset(N, SIGNAL_LENGTH, NUM_TYPES):
-    data = []
-    labels = []
-    data_types = np.random.randint(0, NUM_TYPES, N)
-    omegas = np.random.uniform(0, 10, N)
-    phases = np.random.uniform(0, 2*np.pi, N)
-    offsets = np.random.normal(0, 1, N)
-    noise_amplitudes = np.random.uniform(0.2, 2.0, N)
-    t = np.linspace(0, 5, SIGNAL_LENGTH)
-
-    for d, o, p, off, na in zip(data_types, omegas, phases, offsets, noise_amplitudes):
-        dat = gen_data(t, label=d, omega=o, phase=p,
-                       offset=off, noise_amplitude=na)
-        data.append(dat)
-        labels.append(d)
-    return (data, labels)
-
+import sys
+sys.path.insert(1, '../')
+from gen_data import gen_dataset, plot_data
 
 class Net(nn.Module):
     def __init__(self, SIGNAL_LENGTH, NUM_TYPES):
@@ -69,7 +39,7 @@ if __name__ == '__main__':
     PATH = './model_{}_{}.pth'.format(SIGNAL_LENGTH, NUM_TYPES)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    data, labels = gen_dataset(TEST_N + TRAINING_N, SIGNAL_LENGTH, NUM_TYPES)
+    data, labels, t = gen_dataset(TEST_N + TRAINING_N, SIGNAL_LENGTH, NUM_TYPES)
 
     if not (os.path.exists(PATH)):
         dataset = torch.utils.data.TensorDataset(
