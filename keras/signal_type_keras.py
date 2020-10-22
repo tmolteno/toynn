@@ -11,19 +11,16 @@ sys.path.insert(1, '../')
 
 from gen_data import gen_dataset, plot_data
 
-
 if __name__=="__main__":
-    
     SIGNAL_LENGTH = 512
     TRAINING_N = 150000
     TEST_N = 10000
     N = TEST_N + TRAINING_N
     NUM_TYPES=3
 
-    np.random.seed(101)
+    np.random.seed(102)
 
     data, labels, t = gen_dataset(N, SIGNAL_LENGTH, NUM_TYPES)
-
     #plot_data(data, labels, t, NUM_TYPES)
 
     test_data = np.array(data[0:TEST_N])
@@ -36,10 +33,12 @@ if __name__=="__main__":
     train_labels = tf.keras.utils.to_categorical(train_labels, NUM_TYPES)
     test_labels = tf.keras.utils.to_categorical(test_labels, NUM_TYPES)
 
+    # Now build a simple Neural network with two dense layers and an output layer with three neurons, one
+    # for each category of signal.
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Dense(125, activation=tf.nn.relu, input_shape=(SIGNAL_LENGTH,)))
     model.add(tf.keras.layers.Dense(64, activation=tf.nn.relu, input_shape=(SIGNAL_LENGTH,)))
-    model.add(tf.keras.layers.Dense(NUM_TYPES, activation=tf.nn.softmax))
+    model.add(tf.keras.layers.Dense(NUM_TYPES, activation=tf.nn.softmax))  # Final category output layer
     model.compile(loss='categorical_crossentropy', optimizer='adamax', metrics=['categorical_accuracy'])
     model.summary()
 
@@ -49,6 +48,6 @@ if __name__=="__main__":
 
     ## Now show a few predictions, and their known true values.
     print("\n\nExample Performance")
-    np.set_printoptions(precision=3, suppress=True)
-    for i in range(5):
+    np.set_printoptions(precision=2, suppress=True)
+    for i in range(6):
         print("    Truth: {},  Prediction: {}".format(test_labels[i], model.predict(test_data[i:i+1])[0]))
